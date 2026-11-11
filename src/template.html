@@ -65,6 +65,10 @@ section{padding:64px 0}
 
 /* ===== 案例 ===== */
 .case-card .cover{height:130px;border-radius:10px;background:linear-gradient(135deg,#dbe6fb,#c3d7f7);display:flex;align-items:center;justify-content:center;font-size:2.2em;margin-bottom:14px}
+.case-card .cover-img{padding:0;overflow:hidden}
+.case-card .cover-img img{width:100%;height:130px;object-fit:cover;display:block}
+a.case-card{color:inherit;text-decoration:none;display:block;transition:transform .15s,box-shadow .2s}
+a.case-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(15,42,110,.10)}
 .case-card .meta{font-size:.8em;color:var(--blue);margin-top:6px}
 .case-note{grid-column:1/-1;text-align:center;color:var(--muted);font-size:.85em;background:#fff;border:1px dashed var(--line);border-radius:var(--radius);padding:16px}
 
@@ -332,11 +336,16 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
           return '<div class="card"><div class="ico">' + esc(s.ico) + '</div><h3>' + esc(s.name) + '</h3></div>';
         }).join('');
       }
-      // 工程案例
+      // 工程案例：卡片显示封面图（无图显示 emoji），点击进入独立详情页
       if (Array.isArray(c.cases)) {
-        var h = c.cases.map(function(cs){
-          return '<div class="card case-card"><div class="cover">' + esc(cs.ico) + '</div><h3>' + esc(cs.title) +
-                 '</h3><p>' + esc(cs.desc) + '</p><div class="meta">' + esc(cs.tag) + '</div></div>';
+        var h = c.cases.map(function(cs, ci){
+          var cover = (cs.imgs && cs.imgs.length)
+            ? '<div class="cover cover-img"><img src="' + esc(cs.imgs[0]) + '" alt="' + esc(cs.title) + '" loading="lazy"/></div>'
+            : '<div class="cover">' + esc(cs.ico || '\u{1F3EB}') + '</div>';
+          var n = (cs.imgs && cs.imgs.length > 1) ? ' · ' + cs.imgs.length + ' 图' : '';
+          return '<a class="card case-card" href="case.html?id=' + ci + '">' + cover +
+                 '<h3>' + esc(cs.title) + '</h3><p>' + esc(cs.desc) + '</p>' +
+                 '<div class="meta">' + esc(cs.tag) + n + '</div></a>';
         }).join('');
         if (c.cases.length === 0) h = '<div class="case-note">案例资料整理中</div>';
         document.getElementById('cases-grid').innerHTML = h;

@@ -44,6 +44,11 @@ button{cursor:pointer;border:none;border-radius:8px;padding:10px 18px;font-size:
 .token-box input{margin:8px 0}
 .cert-up{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .cert-prev{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:#fff}
+.case-imgs{display:flex;gap:10px;flex-wrap:wrap;align-items:center;min-height:70px}
+.cimg{position:relative;width:70px;height:70px}
+.cimg img{width:100%;height:100%;object-fit:cover;border-radius:6px;border:1px solid var(--line);background:#fff}
+.cimg .btn-danger{position:absolute;top:-8px;right:-8px;padding:2px 7px;font-size:.7em}
+.cover-tag{position:absolute;bottom:0;left:0;background:var(--blue);color:#fff;font-size:.65em;padding:1px 6px;border-radius:0 6px 0 6px}
 </style>
 </head>
 <body>
@@ -142,7 +147,7 @@ var CONTENT = null;
 var SCHEMAS = [
   {key:"services", label:"主营业务", fields:[["ico","图标(emoji)",0],["title","名称",0],["desc","描述",1]]},
   {key:"solutions", label:"行业解决方案", fields:[["ico","图标(emoji)",0],["name","名称",0]]},
-  {key:"cases", label:"工程案例", fields:[["ico","图标(emoji)",0],["title","项目名称",0],["desc","建设内容",0],["tag","业务标签",0]]},
+  {key:"cases", label:"工程案例", imgUploadMulti:true, fields:[["ico","图标(emoji，无图片时显示)",0],["title","项目名称",0],["desc","项目介绍(详情页显示，可多行)",1],["tag","业务标签",0]]},
   {key:"certs", label:"资质荣誉", imgUpload:true, fields:[["ico","图标(emoji，无图片时显示)",0],["name","证书名称",0],["img","图片路径(上传后自动填写，无需手填)",0]]},
   {key:"news", label:"行业资讯", fields:[["title","标题",0],["url","链接",0],["date","日期",0]]},
   {key:"tenders", label:"招标商机", fields:[["title","标题",0],["url","链接",0],["region","地区",0],["date","日期",0]]}
@@ -234,6 +239,13 @@ function renderList(schema){
         '<input type="file" accept="image/png,image/jpeg" onchange="xhUploadCert(this)" style="font-size:.85em"/>' +
         '</div>';
     }
+    if (schema.imgUploadMulti){
+      var imgs = Array.isArray(item.imgs) ? item.imgs : [];
+      html += '<label>&#128247; 案例图片（最多 6 张，PNG/JPG 每张 1MB 以内；第 1 张作为官网卡片封面，其余在详情页翻看）</label>' +
+        '<div class="case-imgs" data-key="' + schema.key + '" data-i="' + i + '">' + caseImgsHtml(imgs) + '</div>' +
+        '<input type="file" class="case-file" accept="image/png,image/jpeg" multiple style="font-size:.85em;margin-top:8px"/>' +
+        '<div><button type="button" class="btn-ghost" style="margin-top:8px;padding:7px 16px;font-size:.82em" onclick="xhUploadCaseImgs(this)">&#11014; 上传所选图片</button></div>';
+    }
     html += '</div>';
   });
   html += '</div>';
@@ -294,6 +306,81 @@ function xhCollectLists(){
     });
     CONTENT[key][i] = merged;
   });
+}
+
+// ---------- 案例多图管理 ----------
+var REPO_DOCS = "https://api.github.com/repos/haiwangxing1251/xinghai/contents/docs/";
+function caseImgsHtml(imgs){
+  return imgs.map(function(p, idx){
+    return '<div class="cimg"><img src="' + esc(p) + '?v=' + Date.now() + '"/>' +
+      (idx === 0 ? '<span class="cover-tag">封面</span>' : '') +
+      '<button type="button" class="btn-danger" onclick="xhDelCaseImg(this)">&#10005;</button></div>';
+  }).join('') + (imgs.length ? '' : '<span class="muted">暂无图片，选择文件后点下方按钮上传</span>');
+}
+function renderCaseImgsBox(item, imgs){
+  item.querySelector(".case-imgs").innerHTML = caseImgsHtml(imgs);
+}
+function xhDelCaseImg(btn){
+  if (!confirm("确定移除这张图片？（官网卡片和详情页将不再显示，图片文件仍保留在网站上）")) return;
+  var item = btn.closest(".item");
+  xhCollectLists();
+  var key = item.dataset.key, i = +item.dataset.i;
+  var box = btn.closest(".case-imgs");
+  var idx = Array.prototype.indexOf.call(box.children, btn.closest(".cimg"));
+  CONTENT[key][i].imgs.splice(idx, 1);
+  renderCaseImgsBox(item, CONTENT[key][i].imgs);
+}
+function xhUploadCaseImgs(btn){
+  var token = localStorage.getItem("xh_token");
+  if (!token){ toast("请先在上方设置发布授权（粘贴 Token）", false); return; }
+  var item = btn.closest(".item");
+  var key = item.dataset.key, i = +item.dataset.i;
+  var inp = item.querySelector(".case-file");
+  if (!inp.files.length){ toast("请先选择图片文件", false); return; }
+  xhCollectLists();
+  var imgs = CONTENT[key][i].imgs = CONTENT[key][i].imgs || [];
+  var list = Array.prototype.slice.call(inp.files);
+  if (imgs.length + list.length > 6){ toast("最多 6 张，当前已有 " + imgs.length + " 张", false); return; }
+  var bad = list.filter(function(f){ return !/^image\/(png|jpe?g)$/.test(f.type) || f.size > 1024 * 1024; });
+  if (bad.length){ toast("有 " + bad.length + " 张图片不符合要求（PNG/JPG、1MB 以内）", false); return; }
+  var done = 0;
+  toast("正在上传 0/" + list.length + " ...", true);
+  var chain = Promise.resolve();
+  list.forEach(function(f, k){
+    chain = chain.then(function(){
+      var ext = f.type === "image/png" ? "png" : "jpg";
+      var path = "cases/case-" + Date.now() + "-" + k + "." + ext;
+      var reader = new FileReader();
+      return new Promise(function(res, rej){
+        reader.onload = function(){ res(String(reader.result).split(",")[1]); };
+        reader.onerror = function(){ rej(new Error("读取文件失败")); };
+        reader.readAsDataURL(f);
+      }).then(function(b64){
+        return fetch(REPO_DOCS + path, {headers:{Authorization:"token " + token}}).then(function(r){
+          if (r.status === 401 || r.status === 403) throw new Error("授权无效或过期，请重新粘贴 Token");
+          return r.ok ? r.json() : null;
+        }).then(function(info){
+          return fetch(REPO_DOCS + path, {
+            method: "PUT",
+            headers: {Authorization:"token " + token, "Content-Type":"application/json"},
+            body: JSON.stringify({
+              message: "后台上传案例图片 " + new Date().toLocaleString("zh-CN"),
+              content: b64, sha: info ? info.sha : undefined, branch: "main"
+            })
+          });
+        }).then(function(r){ if (!r.ok) throw new Error("上传失败（" + r.status + "）"); });
+      }).then(function(){
+        imgs.push(path);
+        done++;
+        toast("正在上传 " + done + "/" + list.length + " ...", true);
+      });
+    });
+  });
+  chain.then(function(){
+    renderCaseImgsBox(item, imgs);
+    inp.value = "";
+    toast("&#9989; 图片上传完成，点底部「保存并发布」后官网生效", true);
+  }).catch(function(e){ toast(String(e.message || e), false); });
 }
 
 // ---------- 上传资质图片 ----------
