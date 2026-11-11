@@ -95,9 +95,10 @@ button{cursor:pointer;border:none;border-radius:8px;padding:10px 18px;font-size:
   <div class="card">
     <h2>联系方式</h2>
     <div class="row">
-      <div><label>联系电话</label><input type="text" id="f-phone"/></div>
+      <div><label>联系电话（可填多个）</label><input type="text" id="f-phone" placeholder="13607398154（王）13607399556（周）"/></div>
       <div><label>微信</label><input type="text" id="f-wechat"/></div>
     </div>
+    <p class="muted" style="margin-top:6px">&#128161; 多个电话请按「<b>号码（姓名）</b>」连着写，官网会自动识别，每个号码都可点击拨打。</p>
     <div class="row">
       <div><label>公司地址</label><input type="text" id="f-address"/></div>
       <div><label>服务时间</label><input type="text" id="f-hours"/></div>
@@ -107,6 +108,16 @@ button{cursor:pointer;border:none;border-radius:8px;padding:10px 18px;font-size:
       <div><label>纬度（地图导航用，选填）</label><input type="text" id="f-lat" placeholder="如 27.249740"/></div>
     </div>
     <p class="muted">填了经纬度后，官网地图按钮将直达导航模式。获取方法：高德地图 App 长按公司位置，即可看到坐标。</p>
+    <hr style="border:none;border-top:1px solid var(--line);margin:14px 0"/>
+    <label>&#128241; 微信二维码（官网联系板块展示）</label>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <img id="qr-preview" src="wechat_qr.png" alt="当前二维码" style="width:96px;height:96px;border-radius:10px;border:1px solid var(--line);background:#fff"/>
+      <div style="flex:1;min-width:220px">
+        <input type="file" id="qr-file" accept="image/png,image/jpeg" style="font-size:.85em"/>
+        <p class="muted" style="margin-top:6px">选好图片后点右边按钮上传。建议用微信「保存二维码」得到的原图（1MB 以内）。</p>
+        <button class="btn-primary" style="margin-top:8px;padding:8px 20px" onclick="xhUploadQR()">&#11014; 上传并发布二维码</button>
+      </div>
+    </div>
   </div>
 
   <!-- 列表编辑区 -->
@@ -267,6 +278,42 @@ function xhCollectLists(){
       CONTENT[key][i][f[0]] = input.value.trim();
     });
   });
+}
+
+// ---------- 上传微信二维码 ----------
+var QR_API = "https://api.github.com/repos/haiwangxing1251/xinghai/contents/docs/wechat_qr.png";
+function xhUploadQR(){
+  var token = localStorage.getItem("xh_token");
+  if (!token){ toast("请先在上方设置发布授权（粘贴 Token）", false); return; }
+  var f = document.getElementById("qr-file").files[0];
+  if (!f){ toast("请先选择二维码图片", false); return; }
+  if (!/^image\/(png|jpe?g)$/.test(f.type)){ toast("仅支持 PNG / JPG 图片", false); return; }
+  if (f.size > 1024 * 1024){ toast("图片超过 1MB，请压缩后再上传", false); return; }
+  var reader = new FileReader();
+  reader.onload = function(){
+    var b64 = String(reader.result).split(",")[1];
+    toast("正在上传二维码...", true);
+    fetch(QR_API, {headers:{Authorization:"token " + token}}).then(function(r){
+      if (r.status === 401 || r.status === 403) throw new Error("授权无效或过期，请点「更换授权」重新粘贴 Token");
+      return r.ok ? r.json() : null;
+    }).then(function(info){
+      return fetch(QR_API, {
+        method: "PUT",
+        headers: {Authorization:"token " + token, "Content-Type":"application/json"},
+        body: JSON.stringify({
+          message: "后台更换微信二维码 " + new Date().toLocaleString("zh-CN"),
+          content: b64, sha: info ? info.sha : undefined, branch: "main"
+        })
+      });
+    }).then(function(r){
+      if (r.ok) {
+        document.getElementById("qr-preview").src = "wechat_qr.png?v=" + Date.now();
+        document.getElementById("qr-file").value = "";
+        toast("&#9989; 二维码已发布！约 1 分钟后官网生效", true);
+      } else { throw new Error("上传失败（" + r.status + "）"); }
+    }).catch(function(e){ toast(String(e.message || e), false); });
+  };
+  reader.readAsDataURL(f);
 }
 
 // ---------- 保存发布 ----------
