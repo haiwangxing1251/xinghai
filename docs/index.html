@@ -136,9 +136,9 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
 <!-- 首屏 -->
 <header class="hero" id="top">
   <div class="container">
-    <h1>邵阳市星海科技有限公司</h1>
-    <p class="sub">专注弱电智能化工程 · 让建筑更安全、更智能</p>
-    <div class="tags">
+    <h1 id="hero-name">邵阳市星海科技有限公司</h1>
+    <p class="sub" id="hero-slogan">专注弱电智能化工程 · 让建筑更安全、更智能</p>
+    <div class="tags" id="hero-tags">
       <span>视频监控</span><span>门禁考勤</span><span>综合布线</span><span>机房建设</span><span>智能楼宇</span>
     </div>
     <a class="btn btn-primary" href="#cases">查看业务</a>
@@ -154,7 +154,7 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       <h2>主营业务</h2>
       <p>从方案设计、设备选型到施工调试与售后运维，提供弱电工程一站式服务</p>
     </div>
-    <div class="grid grid-3">
+    <div class="grid grid-3" id="services-grid">
       <div class="card"><div class="ico">&#128065;</div><h3>视频监控系统</h3><p>高清网络监控、AI 智能分析、无人机防、存储与平台建设，覆盖园区/厂区/小区等场景。</p></div>
       <div class="card"><div class="ico">&#128273;</div><h3>门禁与考勤系统</h3><p>人脸识别门禁、指纹/刷卡考勤、车牌识别道闸，出入口一体化管理。</p></div>
       <div class="card"><div class="ico">&#128379;</div><h3>综合布线工程</h3><p>楼宇内外网络布线、光纤到户、弱电井规范施工，符合国家布线标准。</p></div>
@@ -173,7 +173,7 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       <h2>行业解决方案</h2>
       <p>针对不同场景的成熟弱电智能化方案</p>
     </div>
-    <div class="grid">
+    <div class="grid" id="solutions-grid">
       <div class="card"><div class="ico">&#127979;</div><h3>校园安防</h3></div>
       <div class="card"><div class="ico">&#127971;</div><h3>医院智能化</h3></div>
       <div class="card"><div class="ico">&#127970;</div><h3>工厂园区</h3></div>
@@ -192,11 +192,10 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       <h2>工程案例</h2>
       <p>部分代表性弱电工程项目</p>
     </div>
-    <div class="grid grid-3">
+    <div class="grid grid-3" id="cases-grid">
       <div class="card case-card"><div class="cover">&#127979;</div><h3>XX 学校监控与门禁系统</h3><p>校园重点区域全覆盖监控 + 人脸门禁</p><div class="meta">视频监控 · 门禁考勤</div></div>
       <div class="card case-card"><div class="cover">&#127970;</div><h3>XX 工厂综合布线项目</h3><p>厂区网络布线与车间无线覆盖</p><div class="meta">综合布线 · 无线覆盖</div></div>
       <div class="card case-card"><div class="cover">&#127976;</div><h3>XX 小区智能安防改造</h3><p>老旧小区监控升级与车牌识别道闸</p><div class="meta">安防改造 · 停车管理</div></div>
-      <div class="case-note">&#128221; 案例资料待补充：可提供项目名称、地点、建设内容与现场照片，由站长随时替换</div>
     </div>
   </div>
 </section>
@@ -209,7 +208,7 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       <h2>资质荣誉</h2>
       <p>专业资质与行业认可</p>
     </div>
-    <div class="certs">
+    <div class="certs" id="certs-grid">
       <div class="cert"><div class="ico">&#127942;</div>安防工程资质</div>
       <div class="cert"><div class="ico">&#128188;</div>营业执照</div>
       <div class="cert"><div class="ico">&#127959;</div>安全生产许可</div>
@@ -229,18 +228,18 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
     <div class="dark-grid">
       <div class="panel">
         <h3>&#128240; 行业资讯</h3>
-        
+        <div id="news-list">
 <div class="empty-hint">行业资讯板块即将上线，届时自动同步弱电安防行业动态</div>
-
+</div>
       </div>
       <div class="panel">
         <h3>&#128203; 招标商机</h3>
-        
+        <div id="tender-list">
 <div class="empty-hint">招标商机板块即将上线，届时自动同步公开招标公告</div>
-
+</div>
       </div>
     </div>
-    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 13:49（北京时间）</p>
+    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 14:52（北京时间）</p>
   </div>
 </section>
 
@@ -253,10 +252,10 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       <p>欢迎来电咨询方案设计与工程报价</p>
     </div>
     <div class="contact-grid">
-      <div class="card"><div class="ico">&#128222;</div><div class="label">联系电话</div><div class="val">1XX-XXXX-XXXX</div></div>
-      <div class="card"><div class="ico">&#128172;</div><div class="label">微信</div><div class="val">同手机号</div></div>
-      <div class="card"><div class="ico">&#128205;</div><div class="label">公司地址</div><div class="val">湖南省邵阳市（详细地址待补充）</div></div>
-      <div class="card"><div class="ico">&#9200;</div><div class="label">服务时间</div><div class="val">周一至周六 8:30 - 18:00</div></div>
+      <div class="card"><div class="ico">&#128222;</div><div class="label">联系电话</div><div class="val" id="c-phone">1XX-XXXX-XXXX</div></div>
+      <div class="card"><div class="ico">&#128172;</div><div class="label">微信</div><div class="val" id="c-wechat">同手机号</div></div>
+      <div class="card"><div class="ico">&#128205;</div><div class="label">公司地址</div><div class="val" id="c-address">湖南省邵阳市（详细地址待补充）</div></div>
+      <div class="card"><div class="ico">&#9200;</div><div class="label">服务时间</div><div class="val" id="c-hours">周一至周六 8:30 - 18:00</div></div>
     </div>
   </div>
 </section>
@@ -275,6 +274,76 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
 document.querySelectorAll('.nav-links a').forEach(function(a){
   a.addEventListener('click', function(){ document.getElementById('navLinks').classList.remove('open'); });
 });
+
+// ===== 动态内容渲染（读取 content.json，后台保存后自动生效） =====
+(function(){
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(m){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+
+  fetch('content.json', {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(c){
+      if (!c) return;
+      // 首屏
+      if (c.company) {
+        if (c.company.name) document.getElementById('hero-name').textContent = c.company.name;
+        if (c.company.slogan) document.getElementById('hero-slogan').textContent = c.company.slogan;
+        if (Array.isArray(c.company.tags) && c.company.tags.length) {
+          document.getElementById('hero-tags').innerHTML = c.company.tags.map(function(t){
+            return '<span>' + esc(t) + '</span>'; }).join('');
+        }
+      }
+      // 主营业务
+      if (Array.isArray(c.services) && c.services.length) {
+        document.getElementById('services-grid').innerHTML = c.services.map(function(s){
+          return '<div class="card"><div class="ico">' + esc(s.ico) + '</div><h3>' + esc(s.title) +
+                 '</h3><p>' + esc(s.desc) + '</p></div>'; }).join('');
+      }
+      // 解决方案
+      if (Array.isArray(c.solutions) && c.solutions.length) {
+        document.getElementById('solutions-grid').innerHTML = c.solutions.map(function(s){
+          return '<div class="card"><div class="ico">' + esc(s.ico) + '</div><h3>' + esc(s.name) + '</h3></div>';
+        }).join('');
+      }
+      // 工程案例
+      if (Array.isArray(c.cases)) {
+        var h = c.cases.map(function(cs){
+          return '<div class="card case-card"><div class="cover">' + esc(cs.ico) + '</div><h3>' + esc(cs.title) +
+                 '</h3><p>' + esc(cs.desc) + '</p><div class="meta">' + esc(cs.tag) + '</div></div>';
+        }).join('');
+        if (c.cases.length === 0) h = '<div class="case-note">案例资料整理中</div>';
+        document.getElementById('cases-grid').innerHTML = h;
+      }
+      // 资质荣誉
+      if (Array.isArray(c.certs) && c.certs.length) {
+        document.getElementById('certs-grid').innerHTML = c.certs.map(function(ct){
+          return '<div class="cert"><div class="ico">' + esc(ct.ico) + '</div>' + esc(ct.name) + '</div>';
+        }).join('');
+      }
+      // 行业资讯
+      if (Array.isArray(c.news)) {
+        document.getElementById('news-list').innerHTML = c.news.length ? c.news.slice(0,8).map(function(n){
+          return '<a class="news-item" href="' + esc(n.url||'#') + '" target="_blank" rel="noopener">' +
+                 '<span class="news-title">' + esc(n.title) + '</span>' +
+                 '<span class="news-date">' + esc(n.date||'') + '</span></a>';
+        }).join('') : '<div class="empty-hint">行业资讯板块即将上线</div>';
+      }
+      // 招标商机
+      if (Array.isArray(c.tenders)) {
+        document.getElementById('tender-list').innerHTML = c.tenders.length ? c.tenders.slice(0,10).map(function(t){
+          return '<a class="tender-item" href="' + esc(t.url||'#') + '" target="_blank" rel="noopener">' +
+                 '<span class="tender-title">' + esc(t.title) + '</span>' +
+                 '<span class="tender-meta">' + esc(t.region||'') + ' · ' + esc(t.date||'') + '</span></a>';
+        }).join('') : '<div class="empty-hint">招标商机板块即将上线</div>';
+      }
+      // 联系方式
+      if (c.contact) {
+        [['phone','c-phone'],['wechat','c-wechat'],['address','c-address'],['hours','c-hours']]
+          .forEach(function(p){ var el = document.getElementById(p[1]);
+            if (c.contact[p[0]]) el.textContent = c.contact[p[0]]; });
+      }
+    }).catch(function(e){ console.warn('content.json 加载失败，使用默认内容', e); });
+})();
 </script>
 </body>
 </html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>网站后台 — 星海科技</title>
+<meta name="robots" content="noindex, nofollow"/>
+<style>
+:root{--blue:#1a56db;--ink:#1f2937;--muted:#6b7280;--bg:#f2f5fa;--card:#fff;--line:#e2e8f0;--ok:#16a34a;--err:#dc2626}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+.container{max-width:860px;margin:0 auto;padding:20px}
+h1{font-size:1.25em;margin-bottom:4px}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+.muted{color:var(--muted);font-size:.85em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+.card>h2{font-size:1.02em;margin-bottom:12px;border-left:4px solid var(--blue);padding-left:10px}
+label{display:block;font-size:.85em;color:var(--muted);margin:10px 0 4px}
+input[type=text],input[type=password],textarea{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95em;font-family:inherit;outline:none;background:#fbfcfe}
+input:focus,textarea:focus{border-color:var(--blue)}
+textarea{min-height:64px;resize:vertical}
+.row{display:flex;gap:12px}
+.row>div{flex:1}
+button{cursor:pointer;border:none;border-radius:8px;padding:10px 18px;font-size:.92em;font-weight:600}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1448b8}
+.btn-ghost{background:#eef2f9;color:var(--ink)}
+.btn-danger{background:#fee2e2;color:var(--err);padding:6px 12px;font-size:.8em}
+.btn-add{background:#dcfce7;color:var(--ok)}
+.item{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;background:#fbfcfe}
+.item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.item-head .t{font-weight:700;font-size:.9em;color:var(--muted)}
+#status{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:10px;color:#fff;font-size:.9em;display:none;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+#status.ok{background:var(--ok)}#status.err{background:var(--err)}
+/* 登录遮罩 */
+#gate{position:fixed;inset:0;background:linear-gradient(135deg,#0b1f4d,#1a56db);display:flex;align-items:center;justify-content:center;z-index:200}
+.gate-box{background:#fff;border-radius:14px;padding:34px 30px;width:320px;text-align:center}
+.gate-box h2{margin-bottom:6px}
+.gate-box p{color:var(--muted);font-size:.85em;margin-bottom:16px}
+.gate-box input{margin-bottom:10px;text-align:center}
+.gate-err{color:var(--err);font-size:.82em;margin-top:8px;display:none}
+.hidden{display:none!important}
+.token-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px;margin-bottom:16px;font-size:.88em}
+.token-box input{margin:8px 0}
+</style>
+</head>
+<body>
+
+<!-- 登录遮罩 -->
+<div id="gate">
+  <div class="gate-box">
+    <h2>&#128274; 网站后台</h2>
+    <p>邵阳市星海科技有限公司</p>
+    <input type="password" id="gate-pwd" placeholder="请输入管理密码" autofocus/>
+    <button class="btn-primary" style="width:100%" onclick="xhGate()">登 录</button>
+    <div class="gate-err" id="gate-err">密码错误，请重试</div>
+  </div>
+</div>
+
+<div class="container hidden" id="app">
+  <div class="top-bar">
+    <div>
+      <h1>星海科技官网后台</h1>
+      <span class="muted">修改后点「保存并发布」，约 1 分钟后网站生效</span>
+    </div>
+    <div>
+      <a href="https://haiwangxing1251.github.io/xinghai/" target="_blank" style="font-size:.85em;color:var(--blue);margin-right:10px">查看官网 ↗</a>
+      <button class="btn-ghost" onclick="xhLogout()">退出</button>
+    </div>
+  </div>
+
+  <!-- Token 管理 -->
+  <div class="token-box" id="token-box">
+    <b>&#128273; 发布授权（首次使用需设置一次）</b>
+    <div id="token-ok" class="hidden">&#9989; 已授权，可以直接保存发布。<button class="btn-ghost" style="padding:4px 10px;font-size:.8em" onclick="xhClearToken()">更换授权</button></div>
+    <div id="token-input-area" class="hidden">
+      <p class="muted">粘贴 GitHub Token（ghp_ 开头，用于把修改发布到网站）。它只保存在你自己这台电脑的浏览器里。</p>
+      <input type="password" id="token-input" placeholder="ghp_..."/>
+      <button class="btn-primary" onclick="xhSaveToken()">保存授权</button>
+    </div>
+  </div>
+
+  <!-- 基本信息 -->
+  <div class="card">
+    <h2>公司信息</h2>
+    <div class="row">
+      <div><label>公司全称</label><input type="text" id="f-name"/></div>
+      <div style="flex:0 0 140px"><label>简称</label><input type="text" id="f-short"/></div>
+    </div>
+    <label>首屏宣传语</label><input type="text" id="f-slogan"/>
+    <label>首屏标签（用逗号分隔）</label><input type="text" id="f-tags"/>
+  </div>
+
+  <!-- 联系方式 -->
+  <div class="card">
+    <h2>联系方式</h2>
+    <div class="row">
+      <div><label>联系电话</label><input type="text" id="f-phone"/></div>
+      <div><label>微信</label><input type="text" id="f-wechat"/></div>
+    </div>
+    <div class="row">
+      <div><label>公司地址</label><input type="text" id="f-address"/></div>
+      <div><label>服务时间</label><input type="text" id="f-hours"/></div>
+    </div>
+  </div>
+
+  <!-- 列表编辑区 -->
+  <div id="lists"></div>
+
+  <div style="text-align:center;margin:26px 0">
+    <button class="btn-primary" style="padding:13px 44px;font-size:1em" onclick="xhSave()">&#128190; 保存并发布</button>
+    <p class="muted" style="margin-top:10px">保存即自动提交到网站，无需其他操作</p>
+  </div>
+</div>
+
+<div id="status"></div>
+
+<script>
+var REPO_API = "https://api.github.com/repos/haiwangxing1251/xinghai/contents/docs/content.json";
+var PWD_HASH = "55fd1ca3b031eb877bbe79c58ee67162abfcb3ac";
+var CONTENT = null;
+
+// ---------- 列表配置 ----------
+var SCHEMAS = [
+  {key:"services", label:"主营业务", fields:[["ico","图标(emoji)",0],["title","名称",0],["desc","描述",1]]},
+  {key:"solutions", label:"行业解决方案", fields:[["ico","图标(emoji)",0],["name","名称",0]]},
+  {key:"cases", label:"工程案例", fields:[["ico","图标(emoji)",0],["title","项目名称",0],["desc","建设内容",0],["tag","业务标签",0]]},
+  {key:"certs", label:"资质荣誉", fields:[["ico","图标(emoji)",0],["name","证书名称",0]]},
+  {key:"news", label:"行业资讯", fields:[["title","标题",0],["url","链接",0],["date","日期",0]]},
+  {key:"tenders", label:"招标商机", fields:[["title","标题",0],["url","链接",0],["region","地区",0],["date","日期",0]]}
+];
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];})}
+
+function sha1Hex(str){
+  return crypto.subtle.digest("SHA-1", new TextEncoder().encode(str)).then(function(buf){
+    return Array.from(new Uint8Array(buf)).map(function(b){return("0"+b.toString(16)).slice(-2)}).join("");
+  });
+}
+function toast(msg, ok){
+  var el = document.getElementById("status");
+  el.textContent = msg; el.className = ok ? "ok" : "err"; el.style.display = "block";
+  clearTimeout(el._t); el._t = setTimeout(function(){ el.style.display = "none"; }, 4000);
+}
+
+// ---------- 登录 ----------
+function xhGate(){
+  var v = document.getElementById("gate-pwd").value;
+  if (!v) return;
+  sha1Hex(v).then(function(h){
+    if (h === PWD_HASH) {
+      sessionStorage.setItem("xh_admin","1");
+      document.getElementById("gate").style.display = "none";
+      document.getElementById("app").classList.remove("hidden");
+      xhInit();
+    } else {
+      document.getElementById("gate-err").style.display = "block";
+      document.getElementById("gate-pwd").value = "";
+    }
+  });
+}
+document.getElementById("gate-pwd").addEventListener("keydown", function(e){ if(e.key==="Enter") xhGate(); });
+function xhLogout(){ sessionStorage.removeItem("xh_admin"); location.reload(); }
+if (sessionStorage.getItem("xh_admin")==="1"){
+  document.getElementById("gate").style.display="none";
+  document.getElementById("app").classList.remove("hidden");
+  xhInit();
+}
+
+// ---------- Token ----------
+function xhRefreshTokenUI(){
+  var has = !!localStorage.getItem("xh_token");
+  document.getElementById("token-ok").classList.toggle("hidden", !has);
+  document.getElementById("token-input-area").classList.toggle("hidden", has);
+}
+function xhSaveToken(){
+  var t = document.getElementById("token-input").value.trim();
+  if (!t){ toast("请先粘贴 Token", false); return; }
+  localStorage.setItem("xh_token", t);
+  xhRefreshTokenUI(); toast("授权已保存", true);
+}
+function xhClearToken(){
+  if (!confirm("确定清除已保存的授权？清除后下次发布需重新粘贴。")) return;
+  localStorage.removeItem("xh_token"); xhRefreshTokenUI();
+}
+
+// ---------- 加载内容 ----------
+function xhInit(){
+  xhRefreshTokenUI();
+  fetch("content.json", {cache:"no-store"})
+    .then(function(r){ return r.ok ? r.json() : Promise.reject("加载失败"); })
+    .then(function(c){ CONTENT = c; xhRenderAll(); })
+    .catch(function(e){ toast("读取网站内容失败，请刷新重试", false); console.error(e); });
+}
+
+// ---------- 渲染表单 ----------
+function fieldInput(type, value, attrs){
+  if (type === 1) return '<textarea ' + attrs + '>' + esc(value) + '</textarea>';
+  return '<input type="text" ' + attrs + ' value="' + esc(value) + '"/>';
+}
+function renderList(schema){
+  var items = CONTENT[schema.key] || [];
+  var html = '<div class="card"><h2>' + schema.label +
+    ' <button class="btn-add" style="float:right;padding:5px 14px;font-size:.8em" onclick="xhAdd(\'' + schema.key + '\')">&#65291; 添加一条</button></h2>';
+  if (!items.length) html += '<p class="muted">暂无内容，点右上角「添加一条」</p>';
+  items.forEach(function(item, i){
+    html += '<div class="item" data-key="' + schema.key + '" data-i="' + i + '"><div class="item-head"><span class="t">#' + (i+1) + '</span>' +
+      '<button class="btn-danger" onclick="xhDel(this)">&#10005; 删除</button></div>';
+    schema.fields.forEach(function(f){
+      html += '<label>' + f[1] + '</label>' + fieldInput(f[2], item[f[0]]||"", 'data-f="' + f[0] + '"');
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+function xhRenderAll(){
+  document.getElementById("f-name").value = CONTENT.company.name || "";
+  document.getElementById("f-short").value = CONTENT.company.short || "";
+  document.getElementById("f-slogan").value = CONTENT.company.slogan || "";
+  document.getElementById("f-tags").value = (CONTENT.company.tags||[]).join("，");
+  ["phone","wechat","address","hours"].forEach(function(k){
+    document.getElementById("f-"+k).value = (CONTENT.contact||{})[k] || "";
+  });
+  document.getElementById("lists").innerHTML = SCHEMAS.map(renderList).join("");
+}
+function xhAdd(key){
+  xhCollectLists();                 // 先把已填内容收进 CONTENT，避免丢失
+  var schema = SCHEMAS.filter(function(s){return s.key===key})[0];
+  var obj = {};
+  schema.fields.forEach(function(f){ obj[f[0]] = ""; });
+  (CONTENT[key] = CONTENT[key]||[]).push(obj);
+  xhRenderAll();
+  // 滚动到刚添加的条目
+  var items = document.querySelectorAll('.item[data-key="'+key+'"]');
+  if (items.length) items[items.length-1].scrollIntoView({behavior:"smooth", block:"center"});
+}
+function xhDel(btn){
+  if (!confirm("确定删除这一条？")) return;
+  var item = btn.closest(".item");
+  xhCollectLists();
+  CONTENT[item.dataset.key].splice(+item.dataset.i, 1);
+  xhRenderAll();
+}
+
+// ---------- 收集表单 ----------
+function xhCollect(){
+  CONTENT.company.name = document.getElementById("f-name").value.trim();
+  CONTENT.company.short = document.getElementById("f-short").value.trim();
+  CONTENT.company.slogan = document.getElementById("f-slogan").value.trim();
+  CONTENT.company.tags = document.getElementById("f-tags").value.split(/[，,]/).map(function(s){return s.trim()}).filter(Boolean);
+  ["phone","wechat","address","hours"].forEach(function(k){
+    CONTENT.contact[k] = document.getElementById("f-"+k).value.trim();
+  });
+}
+function xhCollectLists(){
+  xhCollect();
+  document.querySelectorAll(".item").forEach(function(el){
+    var key = el.dataset.key, i = +el.dataset.i;
+    SCHEMAS.filter(function(s){return s.key===key})[0].fields.forEach(function(f){
+      var input = el.querySelector('[data-f="' + f[0] + '"]');
+      CONTENT[key][i][f[0]] = input.value.trim();
+    });
+  });
+}
+
+// ---------- 保存发布 ----------
+function xhSave(){
+  var token = localStorage.getItem("xh_token");
+  if (!token){ toast("请先在上方设置发布授权（粘贴 Token）", false); return; }
+  xhCollectLists();
+  var body = JSON.stringify(CONTENT, null, 2);
+  var b64 = btoa(unescape(encodeURIComponent(body)));
+  var headers = {Authorization: "token " + token, "Content-Type": "application/json"};
+  toast("正在发布...", true);
+  fetch(REPO_API, {headers: headers}).then(function(r){
+    if (r.status === 401 || r.status === 403) throw new Error("授权无效或过期，请点「更换授权」重新粘贴 Token");
+    return r.ok ? r.json() : null;
+  }).then(function(info){
+    return fetch(REPO_API, {
+      method: "PUT", headers: headers,
+      body: JSON.stringify({
+        message: "后台更新网站内容 " + new Date().toLocaleString("zh-CN"),
+        content: b64, sha: info ? info.sha : undefined, branch: "main"
+      })
+    });
+  }).then(function(r){
+    if (r.ok) { toast("&#9989; 已发布！约 1 分钟后官网生效（记得刷新官网页面）", true); }
+    else { throw new Error("发布失败（" + r.status + "）"); }
+  }).catch(function(e){
+    toast(String(e.message || e), false);
+  });
+}
+</script>
+</body>
+</html>
