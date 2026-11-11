@@ -92,6 +92,10 @@ section{padding:64px 0}
 .contact-grid .ico{font-size:1.8em;margin-bottom:10px}
 .contact-grid .label{color:var(--muted);font-size:.85em;margin-bottom:4px}
 .contact-grid .val{font-weight:600}
+.contact-grid .hint{font-size:.75em;color:var(--blue);margin-top:8px}
+.clickable{cursor:pointer;color:inherit;text-decoration:none;display:block;transition:transform .15s,box-shadow .2s}
+.clickable:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(15,42,110,.10)}
+#copy-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:11px 22px;border-radius:10px;font-size:.88em;display:none;z-index:300;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 
 /* ===== 页脚 ===== */
 footer{background:#0a1633;color:#8ea0c4;padding:34px 0;font-size:.88em;text-align:center}
@@ -248,11 +252,12 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       <p>欢迎来电咨询方案设计与工程报价</p>
     </div>
     <div class="contact-grid">
-      <div class="card"><div class="ico">&#128222;</div><div class="label">联系电话</div><div class="val" id="c-phone">1XX-XXXX-XXXX</div></div>
-      <div class="card"><div class="ico">&#128172;</div><div class="label">微信</div><div class="val" id="c-wechat">同手机号</div></div>
+      <a class="card clickable" id="c-phone-card"><div class="ico">&#128222;</div><div class="label">联系电话</div><div class="val" id="c-phone">1XX-XXXX-XXXX</div><div class="hint">&#128241; 点击拨打</div></a>
+      <div class="card clickable" id="c-wechat-card"><div class="ico">&#128172;</div><div class="label">微信</div><div class="val" id="c-wechat">同手机号</div><div class="hint">&#128203; 点击复制微信号</div></div>
       <div class="card"><div class="ico">&#128205;</div><div class="label">公司地址</div><div class="val" id="c-address">湖南省邵阳市（详细地址待补充）</div></div>
       <div class="card"><div class="ico">&#9200;</div><div class="label">服务时间</div><div class="val" id="c-hours">周一至周六 8:30 - 18:00</div></div>
     </div>
+    <div id="copy-toast">&#9989; 微信号已复制，请打开微信搜索添加</div>
   </div>
 </section>
 
@@ -337,6 +342,30 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
         [['phone','c-phone'],['wechat','c-wechat'],['address','c-address'],['hours','c-hours']]
           .forEach(function(p){ var el = document.getElementById(p[1]);
             if (c.contact[p[0]]) el.textContent = c.contact[p[0]]; });
+        // 电话卡片：点击拨打
+        if (c.contact.phone) {
+          document.getElementById('c-phone-card').href =
+            'tel:' + String(c.contact.phone).replace(/[^0-9+]/g, '');
+        }
+        // 微信卡片：点击复制（微信号与电话相同时自动复制号码）
+        var wxCard = document.getElementById('c-wechat-card');
+        wxCard.addEventListener('click', function(){
+          var wx = c.contact.wechat || '';
+          if (!wx || wx === '同手机号') wx = c.contact.phone || wx;
+          if (!wx) return;
+          function ok(){
+            var t = document.getElementById('copy-toast');
+            t.style.display = 'block';
+            clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = 'none'; }, 2600);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(wx).then(ok).catch(function(){
+              window.prompt('长按复制微信号：', wx);
+            });
+          } else {
+            window.prompt('长按复制微信号：', wx);
+          }
+        });
       }
     }).catch(function(e){ console.warn('content.json 加载失败，使用默认内容', e); });
 })();
