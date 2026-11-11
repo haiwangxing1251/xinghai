@@ -42,6 +42,8 @@ button{cursor:pointer;border:none;border-radius:8px;padding:10px 18px;font-size:
 .hidden{display:none!important}
 .token-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px;margin-bottom:16px;font-size:.88em}
 .token-box input{margin:8px 0}
+.cert-up{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.cert-prev{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:#fff}
 </style>
 </head>
 <body>
@@ -141,7 +143,7 @@ var SCHEMAS = [
   {key:"services", label:"主营业务", fields:[["ico","图标(emoji)",0],["title","名称",0],["desc","描述",1]]},
   {key:"solutions", label:"行业解决方案", fields:[["ico","图标(emoji)",0],["name","名称",0]]},
   {key:"cases", label:"工程案例", fields:[["ico","图标(emoji)",0],["title","项目名称",0],["desc","建设内容",0],["tag","业务标签",0]]},
-  {key:"certs", label:"资质荣誉", fields:[["ico","图标(emoji)",0],["name","证书名称",0]]},
+  {key:"certs", label:"资质荣誉", imgUpload:true, fields:[["ico","图标(emoji，无图片时显示)",0],["name","证书名称",0],["img","图片路径(上传后自动填写，无需手填)",0]]},
   {key:"news", label:"行业资讯", fields:[["title","标题",0],["url","链接",0],["date","日期",0]]},
   {key:"tenders", label:"招标商机", fields:[["title","标题",0],["url","链接",0],["region","地区",0],["date","日期",0]]}
 ];
@@ -225,6 +227,13 @@ function renderList(schema){
     schema.fields.forEach(function(f){
       html += '<label>' + f[1] + '</label>' + fieldInput(f[2], item[f[0]]||"", 'data-f="' + f[0] + '"');
     });
+    if (schema.imgUpload){
+      var prev = item.img ? '<img class="cert-prev" src="' + esc(item.img) + '?v=' + Date.now() + '"/>' : '';
+      html += '<label>&#128247; 证书图片（PNG / JPG，1MB 以内；上传后前台直接显示，点图片可放大）</label>' +
+        '<div class="cert-up">' + prev +
+        '<input type="file" accept="image/png,image/jpeg" onchange="xhUploadCert(this)" style="font-size:.85em"/>' +
+        '</div>';
+    }
     html += '</div>';
   });
   html += '</div>';
@@ -278,6 +287,49 @@ function xhCollectLists(){
       CONTENT[key][i][f[0]] = input.value.trim();
     });
   });
+}
+
+// ---------- 上传资质图片 ----------
+function xhUploadCert(inp){
+  var token = localStorage.getItem("xh_token");
+  if (!token){ toast("请先在上方设置发布授权（粘贴 Token）", false); inp.value = ""; return; }
+  var f = inp.files[0];
+  if (!f) return;
+  if (!/^image\/(png|jpe?g)$/.test(f.type)){ toast("仅支持 PNG / JPG 图片", false); inp.value = ""; return; }
+  if (f.size > 1024 * 1024){ toast("图片超过 1MB，请压缩后再上传", false); inp.value = ""; return; }
+  var item = inp.closest(".item");
+  var imgInput = item.querySelector('[data-f="img"]');
+  var ext = f.type === "image/png" ? "png" : "jpg";
+  var path = "certs/cert-" + Date.now() + "." + ext;
+  var api = "https://api.github.com/repos/haiwangxing1251/xinghai/contents/docs/" + path;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var b64 = String(reader.result).split(",")[1];
+    toast("正在上传资质图片...", true);
+    fetch(api, {headers:{Authorization:"token " + token}}).then(function(r){
+      if (r.status === 401 || r.status === 403) throw new Error("授权无效或过期，请重新粘贴 Token");
+      return r.ok ? r.json() : null;
+    }).then(function(info){
+      return fetch(api, {
+        method: "PUT",
+        headers: {Authorization:"token " + token, "Content-Type":"application/json"},
+        body: JSON.stringify({
+          message: "后台上传资质图片 " + new Date().toLocaleString("zh-CN"),
+          content: b64, sha: info ? info.sha : undefined, branch: "main"
+        })
+      });
+    }).then(function(r){
+      if (r.ok) {
+        imgInput.value = path;
+        var prev = item.querySelector(".cert-prev");
+        if (prev) { prev.src = path + "?v=" + Date.now(); prev.style.display = "block"; }
+        else { inp.closest(".cert-up").insertAdjacentHTML("afterbegin",
+          '<img class="cert-prev" src="' + path + '?v=' + Date.now() + '"/>'); }
+        toast("&#9989; 图片已上传，点底部「保存并发布」后官网生效", true);
+      } else { throw new Error("上传失败（" + r.status + "）"); }
+    }).catch(function(e){ toast(String(e.message || e), false); });
+  };
+  reader.readAsDataURL(f);
 }
 
 // ---------- 上传微信二维码 ----------
