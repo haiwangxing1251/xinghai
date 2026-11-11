@@ -265,7 +265,7 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
 </div>
       </div>
     </div>
-    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 16:43（北京时间）</p>
+    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 18:00（北京时间）</p>
   </div>
 </section>
 
@@ -337,7 +337,8 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
       // 解决方案
       if (Array.isArray(c.solutions) && c.solutions.length) {
         document.getElementById('solutions-grid').innerHTML = c.solutions.map(function(s){
-          return '<div class="card"><div class="ico">' + esc(s.ico) + '</div><h3>' + esc(s.name) + '</h3></div>';
+          return '<div class="card"><div class="ico">' + esc(s.ico) + '</div><h3>' + esc(s.name) +
+                 '</h3><p>' + esc(s.desc || '') + '</p></div>';
         }).join('');
       }
       // 工程案例：卡片显示封面图（无图显示 emoji），点击进入独立详情页
