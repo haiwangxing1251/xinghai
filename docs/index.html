@@ -93,6 +93,13 @@ section{padding:64px 0}
 .contact-grid .label{color:var(--muted);font-size:.85em;margin-bottom:4px}
 .contact-grid .val{font-weight:600}
 .contact-grid .hint{font-size:.75em;color:var(--blue);margin-top:8px}
+.qr-box{text-align:center;margin-top:26px}
+.qr-box img{width:190px;height:190px;border-radius:14px;box-shadow:0 8px 24px rgba(15,42,110,.14);cursor:zoom-in;background:#fff;padding:6px}
+.qr-box .qr-tip{margin-top:10px;font-size:.85em;color:var(--muted)}
+.qr-box .qr-tip b{color:var(--blue)}
+.qr-box .qr-zoom{color:#9aa7bd;font-size:.9em}
+#qr-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:400;align-items:center;justify-content:center;cursor:zoom-out}
+#qr-lightbox img{width:min(72vw,420px);height:min(72vw,420px);border-radius:16px;background:#fff;padding:12px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
 .clickable{cursor:pointer;color:inherit;text-decoration:none;display:block;transition:transform .15s,box-shadow .2s}
 .clickable:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(15,42,110,.10)}
 .map-links{display:flex;gap:8px;justify-content:center;margin-top:10px}
@@ -246,7 +253,7 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
 </div>
       </div>
     </div>
-    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 15:44（北京时间）</p>
+    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 15:53（北京时间）</p>
   </div>
 </section>
 
@@ -266,6 +273,11 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       </div>
       <div class="card"><div class="ico">&#9200;</div><div class="label">服务时间</div><div class="val" id="c-hours">周一至周六 8:30 - 18:00</div></div>
     </div>
+    <div class="qr-box">
+      <img id="wechat-qr" src="wechat_qr.png" alt="微信二维码" title="点击放大"/>
+      <div class="qr-tip">&#128241; 微信扫码添加，或<b>长按二维码</b>识别加好友 <span class="qr-zoom">&#128269; 点击可放大</span></div>
+    </div>
+    <div id="qr-lightbox"><img src="wechat_qr.png" alt="微信二维码（放大）"/></div>
     <div id="copy-toast">&#9989; 微信号已复制，请打开微信搜索添加</div>
   </div>
 </section>
@@ -376,6 +388,10 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
           document.getElementById('map-baidu').href =
             'https://api.map.baidu.com/geocoder?address=' + kw + '&output=html&src=xinghai_web';
         }
+        // 微信二维码：点击放大 / 再点关闭
+        var lb = document.getElementById('qr-lightbox');
+        document.getElementById('wechat-qr').addEventListener('click', function(){ lb.style.display = 'flex'; });
+        lb.addEventListener('click', function(){ lb.style.display = 'none'; });
         // 微信卡片：点击复制（微信号与电话相同时自动复制号码）
         var wxCard = document.getElementById('c-wechat-card');
         wxCard.addEventListener('click', function(){
