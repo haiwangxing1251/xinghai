@@ -1,0 +1,52 @@
+# ============================================================
+# 星海科技官网 — 自动部署工作流
+# ============================================================
+# push 到 main 时：生成 HTML → 部署到 GitHub Pages
+# 二期将加入：每日定时抓取行业资讯 + 招标公告后重新生成部署
+# ============================================================
+
+name: 部署星海科技官网
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "xinghai-pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 生成官网 HTML
+        run: python generate_site.py
+
+      - name: 配置 GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: 上传页面制品
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs'
+
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

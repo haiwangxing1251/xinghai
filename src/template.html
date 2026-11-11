@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>__COMPANY__ — 弱电智能化工程</title>
+<meta name="description" content="__COMPANY__专注弱电智能化工程：视频监控、门禁考勤、综合布线、机房建设、智能楼宇系统设计与施工。"/>
+<style>
+:root{
+  --blue:#1a56db; --blue-dark:#0f3ea8; --ink:#1f2937; --muted:#6b7280;
+  --bg:#f7f9fc; --card:#ffffff; --line:#e5e9f0; --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.7}
+a{text-decoration:none;color:inherit}
+img{max-width:100%}
+.container{max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* ===== 导航 ===== */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05em;color:var(--blue-dark)}
+.brand .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),#3b82f6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.9em;font-weight:800}
+.nav-links{display:flex;gap:26px;font-size:.95em}
+.nav-links a{color:var(--muted);transition:color .2s}
+.nav-links a:hover{color:var(--blue)}
+.nav-toggle{display:none;background:none;border:none;font-size:1.5em;color:var(--ink);cursor:pointer}
+
+/* ===== 首屏 ===== */
+.hero{background:linear-gradient(135deg,#0b1f4d 0%,#123a8f 55%,#1a56db 100%);color:#fff;padding:88px 0 92px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:380px;height:380px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::before{content:"";position:absolute;right:60px;bottom:-160px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.05)}
+.hero h1{font-size:2.2em;font-weight:800;letter-spacing:.02em;margin-bottom:14px}
+.hero .sub{font-size:1.05em;opacity:.92;margin-bottom:10px}
+.hero .tags{margin:22px 0 30px;display:flex;gap:10px;flex-wrap:wrap}
+.hero .tags span{border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:5px 14px;font-size:.85em;opacity:.95}
+.btn{display:inline-block;padding:11px 26px;border-radius:10px;font-weight:600;font-size:.95em;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:#fff;color:var(--blue-dark)}
+.btn-ghost{border:1px solid rgba(255,255,255,.5);color:#fff;margin-left:12px}
+
+/* ===== 通用区块 ===== */
+section{padding:64px 0}
+.sec-head{text-align:center;margin-bottom:38px}
+.sec-head .kicker{color:var(--blue);font-size:.85em;font-weight:700;letter-spacing:.2em;margin-bottom:6px}
+.sec-head h2{font-size:1.7em;font-weight:800}
+.sec-head p{color:var(--muted);margin-top:8px;font-size:.95em}
+
+/* ===== 业务 ===== */
+.grid{display:grid;gap:18px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(15,42,110,.10)}
+.card .ico{font-size:1.9em;margin-bottom:12px}
+.card h3{font-size:1.08em;margin-bottom:8px}
+.card p{color:var(--muted);font-size:.9em}
+
+/* ===== 解决方案 ===== */
+.sol{background:#eef3fb}
+.sol .grid{grid-template-columns:repeat(3,1fr)}
+.sol .card{text-align:center;padding:30px 18px}
+.sol .card h3{font-size:1em}
+.sol .card .ico{font-size:2em;margin-bottom:8px}
+
+/* ===== 案例 ===== */
+.case-card .cover{height:130px;border-radius:10px;background:linear-gradient(135deg,#dbe6fb,#c3d7f7);display:flex;align-items:center;justify-content:center;font-size:2.2em;margin-bottom:14px}
+.case-card .meta{font-size:.8em;color:var(--blue);margin-top:6px}
+.case-note{grid-column:1/-1;text-align:center;color:var(--muted);font-size:.85em;background:#fff;border:1px dashed var(--line);border-radius:var(--radius);padding:16px}
+
+/* ===== 资质 ===== */
+.certs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.cert{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 14px;text-align:center;font-size:.9em}
+.cert .ico{font-size:1.6em;margin-bottom:8px}
+
+/* ===== 资讯 / 招标 ===== */
+.dark-sec{background:#0d1b3d;color:#e8ecf5}
+.dark-sec .sec-head h2{color:#fff}
+.dark-sec .sec-head .kicker{color:#7ea6f8}
+.dark-sec .sec-head p{color:#9fb0d0}
+.dark-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:24px}
+.panel h3{font-size:1.05em;margin-bottom:16px;color:#fff}
+.news-item,.tender-item{display:flex;justify-content:space-between;gap:14px;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.08);font-size:.9em;color:#cfd9ec}
+.news-item:hover,.tender-item:hover{color:#fff}
+.news-item .news-date,.tender-item .tender-meta{color:#8296bd;white-space:nowrap;font-size:.85em}
+.empty-hint{color:#8fa2c6;font-size:.9em;text-align:center;padding:26px 0;border:1px dashed rgba(255,255,255,.18);border-radius:10px}
+
+/* ===== 联系 ===== */
+.contact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center}
+.contact-grid .card{padding:26px 14px}
+.contact-grid .ico{font-size:1.8em;margin-bottom:10px}
+.contact-grid .label{color:var(--muted);font-size:.85em;margin-bottom:4px}
+.contact-grid .val{font-weight:600}
+
+/* ===== 页脚 ===== */
+footer{background:#0a1633;color:#8ea0c4;padding:34px 0;font-size:.88em;text-align:center}
+footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
+
+/* ===== 响应式 ===== */
+@media(max-width:860px){
+  .grid-3,.sol .grid{grid-template-columns:repeat(2,1fr)}
+  .certs{grid-template-columns:repeat(2,1fr)}
+  .contact-grid{grid-template-columns:repeat(2,1fr)}
+  .dark-grid{grid-template-columns:1fr}
+  .hero h1{font-size:1.6em}
+  .hero{padding:64px 0}
+  .nav-links{position:absolute;top:60px;right:0;left:0;background:#fff;flex-direction:column;gap:0;border-bottom:1px solid var(--line);display:none;padding:8px 0}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:12px 24px}
+  .nav-toggle{display:block}
+}
+@media(max-width:520px){
+  .grid-3,.sol .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- 导航 -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#top"><span class="logo">星海</span>__COMPANY_SHORT__</a>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
+    <div class="nav-links" id="navLinks">
+      <a href="#services">主营业务</a>
+      <a href="#solutions">解决方案</a>
+      <a href="#cases">工程案例</a>
+      <a href="#certs">资质荣誉</a>
+      <a href="#industry">行业动态</a>
+      <a href="#contact">联系我们</a>
+    </div>
+  </div>
+</nav>
+
+<!-- 首屏 -->
+<header class="hero" id="top">
+  <div class="container">
+    <h1>__COMPANY__</h1>
+    <p class="sub">专注弱电智能化工程 · 让建筑更安全、更智能</p>
+    <div class="tags">
+      <span>视频监控</span><span>门禁考勤</span><span>综合布线</span><span>机房建设</span><span>智能楼宇</span>
+    </div>
+    <a class="btn btn-primary" href="#cases">查看业务</a>
+    <a class="btn btn-ghost" href="#contact">联系我们</a>
+  </div>
+</header>
+
+<!-- 主营业务 -->
+<section id="services">
+  <div class="container">
+    <div class="sec-head">
+      <div class="kicker">SERVICES</div>
+      <h2>主营业务</h2>
+      <p>从方案设计、设备选型到施工调试与售后运维，提供弱电工程一站式服务</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card"><div class="ico">&#128065;</div><h3>视频监控系统</h3><p>高清网络监控、AI 智能分析、无人机防、存储与平台建设，覆盖园区/厂区/小区等场景。</p></div>
+      <div class="card"><div class="ico">&#128273;</div><h3>门禁与考勤系统</h3><p>人脸识别门禁、指纹/刷卡考勤、车牌识别道闸，出入口一体化管理。</p></div>
+      <div class="card"><div class="ico">&#128379;</div><h3>综合布线工程</h3><p>楼宇内外网络布线、光纤到户、弱电井规范施工，符合国家布线标准。</p></div>
+      <div class="card"><div class="ico">&#127970;</div><h3>机房与弱电工程</h3><p>标准化机房建设、UPS 供配电、精密空调、防雷接地与动环监控。</p></div>
+      <div class="card"><div class="ico">&#127968;</div><h3>智能楼宇系统</h3><p>楼宇对讲、背景音乐、会议系统、能耗监测，让楼宇管理更高效。</p></div>
+      <div class="card"><div class="ico">&#128246;</div><h3>网络与无线覆盖</h3><p>企业组网、全屋/全园 WiFi 覆盖、网络安防设备调试与运维。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 解决方案 -->
+<section id="solutions" class="sol">
+  <div class="container">
+    <div class="sec-head">
+      <div class="kicker">SOLUTIONS</div>
+      <h2>行业解决方案</h2>
+      <p>针对不同场景的成熟弱电智能化方案</p>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="ico">&#127979;</div><h3>校园安防</h3></div>
+      <div class="card"><div class="ico">&#127971;</div><h3>医院智能化</h3></div>
+      <div class="card"><div class="ico">&#127970;</div><h3>工厂园区</h3></div>
+      <div class="card"><div class="ico">&#127976;</div><h3>住宅小区</h3></div>
+      <div class="card"><div class="ico">&#127970;</div><h3>写字楼宇</h3></div>
+      <div class="card"><div class="ico">&#128666;</div><h3>停车场管理</h3></div>
+    </div>
+  </div>
+</section>
+
+<!-- 工程案例 -->
+<section id="cases">
+  <div class="container">
+    <div class="sec-head">
+      <div class="kicker">PROJECTS</div>
+      <h2>工程案例</h2>
+      <p>部分代表性弱电工程项目</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card case-card"><div class="cover">&#127979;</div><h3>XX 学校监控与门禁系统</h3><p>校园重点区域全覆盖监控 + 人脸门禁</p><div class="meta">视频监控 · 门禁考勤</div></div>
+      <div class="card case-card"><div class="cover">&#127970;</div><h3>XX 工厂综合布线项目</h3><p>厂区网络布线与车间无线覆盖</p><div class="meta">综合布线 · 无线覆盖</div></div>
+      <div class="card case-card"><div class="cover">&#127976;</div><h3>XX 小区智能安防改造</h3><p>老旧小区监控升级与车牌识别道闸</p><div class="meta">安防改造 · 停车管理</div></div>
+      <div class="case-note">&#128221; 案例资料待补充：可提供项目名称、地点、建设内容与现场照片，由站长随时替换</div>
+    </div>
+  </div>
+</section>
+
+<!-- 资质荣誉 -->
+<section id="certs" style="padding-top:0">
+  <div class="container">
+    <div class="sec-head">
+      <div class="kicker">QUALIFICATIONS</div>
+      <h2>资质荣誉</h2>
+      <p>专业资质与行业认可</p>
+    </div>
+    <div class="certs">
+      <div class="cert"><div class="ico">&#127942;</div>安防工程资质</div>
+      <div class="cert"><div class="ico">&#128188;</div>营业执照</div>
+      <div class="cert"><div class="ico">&#127959;</div>安全生产许可</div>
+      <div class="cert"><div class="ico">&#128220;</div>行业荣誉证书</div>
+    </div>
+  </div>
+</section>
+
+<!-- 行业动态（资讯 + 招商，二期自动更新） -->
+<section id="industry" class="dark-sec">
+  <div class="container">
+    <div class="sec-head">
+      <div class="kicker">INDUSTRY</div>
+      <h2>行业动态</h2>
+      <p>弱电安防行业资讯与公开招标商机（自动更新）</p>
+    </div>
+    <div class="dark-grid">
+      <div class="panel">
+        <h3>&#128240; 行业资讯</h3>
+        __NEWS_ITEMS__
+      </div>
+      <div class="panel">
+        <h3>&#128203; 招标商机</h3>
+        __TENDER_ITEMS__
+      </div>
+    </div>
+    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：__UPDATED__（北京时间）</p>
+  </div>
+</section>
+
+<!-- 联系我们 -->
+<section id="contact">
+  <div class="container">
+    <div class="sec-head">
+      <div class="kicker">CONTACT</div>
+      <h2>联系我们</h2>
+      <p>欢迎来电咨询方案设计与工程报价</p>
+    </div>
+    <div class="contact-grid">
+      <div class="card"><div class="ico">&#128222;</div><div class="label">联系电话</div><div class="val">1XX-XXXX-XXXX</div></div>
+      <div class="card"><div class="ico">&#128172;</div><div class="label">微信</div><div class="val">同手机号</div></div>
+      <div class="card"><div class="ico">&#128205;</div><div class="label">公司地址</div><div class="val">湖南省邵阳市（详细地址待补充）</div></div>
+      <div class="card"><div class="ico">&#9200;</div><div class="label">服务时间</div><div class="val">周一至周六 8:30 - 18:00</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 页脚 -->
+<footer>
+  <div class="container">
+    <div class="strong">__COMPANY__</div>
+    <p>弱电智能化工程 · 视频监控 · 门禁考勤 · 综合布线 · 机房建设</p>
+    <p style="margin-top:10px;opacity:.7">&copy; 2026 __COMPANY__ 版权所有</p>
+  </div>
+</footer>
+
+<script>
+// 点击导航后自动收起移动端菜单
+document.querySelectorAll('.nav-links a').forEach(function(a){
+  a.addEventListener('click', function(){ document.getElementById('navLinks').classList.remove('open'); });
+});
+</script>
+</body>
+</html>
