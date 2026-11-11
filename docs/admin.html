@@ -274,18 +274,25 @@ function xhCollect(){
   CONTENT.company.short = document.getElementById("f-short").value.trim();
   CONTENT.company.slogan = document.getElementById("f-slogan").value.trim();
   CONTENT.company.tags = document.getElementById("f-tags").value.split(/[，,]/).map(function(s){return s.trim()}).filter(Boolean);
+  // 合并模式：只更新表单里存在的字段，保留其他字段（如经纬度），旧版缓存页面保存也不会丢数据
+  var patch = {};
   ["phone","wechat","address","hours","lng","lat"].forEach(function(k){
-    CONTENT.contact[k] = document.getElementById("f-"+k).value.trim();
+    var el = document.getElementById("f-"+k);
+    if (el) patch[k] = el.value.trim();
   });
+  CONTENT.contact = Object.assign({}, CONTENT.contact || {}, patch);
 }
 function xhCollectLists(){
   xhCollect();
   document.querySelectorAll(".item").forEach(function(el){
     var key = el.dataset.key, i = +el.dataset.i;
+    // 合并模式：只更新表单里存在的字段，保留其他字段（如图片路径），旧版缓存页面保存也不会丢数据
+    var merged = Object.assign({}, CONTENT[key][i] || {});
     SCHEMAS.filter(function(s){return s.key===key})[0].fields.forEach(function(f){
       var input = el.querySelector('[data-f="' + f[0] + '"]');
-      CONTENT[key][i][f[0]] = input.value.trim();
+      if (input) merged[f[0]] = input.value.trim();
     });
+    CONTENT[key][i] = merged;
   });
 }
 
