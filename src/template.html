@@ -95,6 +95,9 @@ section{padding:64px 0}
 .contact-grid .hint{font-size:.75em;color:var(--blue);margin-top:8px}
 .clickable{cursor:pointer;color:inherit;text-decoration:none;display:block;transition:transform .15s,box-shadow .2s}
 .clickable:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(15,42,110,.10)}
+.map-links{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.map-links a{font-size:.75em;padding:4px 14px;border-radius:14px;background:#eef4ff;color:var(--blue);border:1px solid #d8e3fb;transition:background .2s}
+.map-links a:hover{background:#dce8ff}
 #copy-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:11px 22px;border-radius:10px;font-size:.88em;display:none;z-index:300;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 
 /* ===== 页脚 ===== */
@@ -254,7 +257,9 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
     <div class="contact-grid">
       <a class="card clickable" id="c-phone-card"><div class="ico">&#128222;</div><div class="label">联系电话</div><div class="val" id="c-phone">1XX-XXXX-XXXX</div><div class="hint">&#128241; 点击拨打</div></a>
       <div class="card clickable" id="c-wechat-card"><div class="ico">&#128172;</div><div class="label">微信</div><div class="val" id="c-wechat">同手机号</div><div class="hint">&#128203; 点击复制微信号</div></div>
-      <div class="card"><div class="ico">&#128205;</div><div class="label">公司地址</div><div class="val" id="c-address">湖南省邵阳市（详细地址待补充）</div></div>
+      <div class="card"><div class="ico">&#128205;</div><div class="label">公司地址</div><div class="val" id="c-address">湖南省邵阳市（详细地址待补充）</div>
+        <div class="map-links"><a id="map-amap" target="_blank" rel="noopener">&#128666; 高德导航</a><a id="map-baidu" target="_blank" rel="noopener">&#128666; 百度导航</a></div>
+      </div>
       <div class="card"><div class="ico">&#9200;</div><div class="label">服务时间</div><div class="val" id="c-hours">周一至周六 8:30 - 18:00</div></div>
     </div>
     <div id="copy-toast">&#9989; 微信号已复制，请打开微信搜索添加</div>
@@ -346,6 +351,15 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
         if (c.contact.phone) {
           document.getElementById('c-phone-card').href =
             'tel:' + String(c.contact.phone).replace(/[^0-9+]/g, '');
+        }
+        // 地址卡片：地图导航链接（自动跟随后台填写的地址）
+        var addr = c.contact.address || '';
+        if (addr) {
+          var kw = encodeURIComponent(addr);
+          document.getElementById('map-amap').href =
+            'https://uri.amap.com/search?keyword=' + kw + '&src=xinghai_web&callnative=1';
+          document.getElementById('map-baidu').href =
+            'https://api.map.baidu.com/geocoder?address=' + kw + '&output=html&src=xinghai_web';
         }
         // 微信卡片：点击复制（微信号与电话相同时自动复制号码）
         var wxCard = document.getElementById('c-wechat-card');
