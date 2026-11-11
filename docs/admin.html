@@ -102,6 +102,11 @@ button{cursor:pointer;border:none;border-radius:8px;padding:10px 18px;font-size:
       <div><label>公司地址</label><input type="text" id="f-address"/></div>
       <div><label>服务时间</label><input type="text" id="f-hours"/></div>
     </div>
+    <div class="row">
+      <div><label>经度（地图导航用，选填）</label><input type="text" id="f-lng" placeholder="如 111.518220"/></div>
+      <div><label>纬度（地图导航用，选填）</label><input type="text" id="f-lat" placeholder="如 27.249740"/></div>
+    </div>
+    <p class="muted">填了经纬度后，官网地图按钮将直达导航模式。获取方法：高德地图 App 长按公司位置，即可看到坐标。</p>
   </div>
 
   <!-- 列表编辑区 -->
@@ -219,7 +224,7 @@ function xhRenderAll(){
   document.getElementById("f-short").value = CONTENT.company.short || "";
   document.getElementById("f-slogan").value = CONTENT.company.slogan || "";
   document.getElementById("f-tags").value = (CONTENT.company.tags||[]).join("，");
-  ["phone","wechat","address","hours"].forEach(function(k){
+  ["phone","wechat","address","hours","lng","lat"].forEach(function(k){
     document.getElementById("f-"+k).value = (CONTENT.contact||{})[k] || "";
   });
   document.getElementById("lists").innerHTML = SCHEMAS.map(renderList).join("");
@@ -249,7 +254,7 @@ function xhCollect(){
   CONTENT.company.short = document.getElementById("f-short").value.trim();
   CONTENT.company.slogan = document.getElementById("f-slogan").value.trim();
   CONTENT.company.tags = document.getElementById("f-tags").value.split(/[，,]/).map(function(s){return s.trim()}).filter(Boolean);
-  ["phone","wechat","address","hours"].forEach(function(k){
+  ["phone","wechat","address","hours","lng","lat"].forEach(function(k){
     CONTENT.contact[k] = document.getElementById("f-"+k).value.trim();
   });
 }

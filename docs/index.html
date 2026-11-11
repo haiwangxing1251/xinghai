@@ -246,7 +246,7 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
 </div>
       </div>
     </div>
-    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 15:25（北京时间）</p>
+    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 15:44（北京时间）</p>
   </div>
 </section>
 
@@ -356,9 +356,20 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
           document.getElementById('c-phone-card').href =
             'tel:' + String(c.contact.phone).replace(/[^0-9+]/g, '');
         }
-        // 地址卡片：地图导航链接（自动跟随后台填写的地址）
+        // 地址卡片：地图导航链接
+        // 有经纬度 → 直达路线规划/标记点；无 → 按地址关键词搜索
         var addr = c.contact.address || '';
-        if (addr) {
+        var lng = c.contact.lng, lat = c.contact.lat;
+        var poi = encodeURIComponent((c.company && c.company.name) || addr);
+        if (lng && lat) {
+          document.getElementById('map-amap').href =
+            'https://uri.amap.com/navigation?to=' + lng + ',' + lat + ',' + poi +
+            '&mode=car&policy=1&src=xinghai_web&coordinate=gaode&callnative=1';
+          document.getElementById('map-baidu').href =
+            'https://api.map.baidu.com/marker?location=' + lat + ',' + lng +
+            '&title=' + poi + '&content=' + encodeURIComponent(addr) +
+            '&output=html&coord_type=gcj02&src=xinghai_web';
+        } else if (addr) {
           var kw = encodeURIComponent(addr);
           document.getElementById('map-amap').href =
             'https://uri.amap.com/search?keyword=' + kw + '&src=xinghai_web&callnative=1';
