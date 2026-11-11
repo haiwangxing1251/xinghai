@@ -93,11 +93,12 @@ section{padding:64px 0}
 .contact-grid .label{color:var(--muted);font-size:.85em;margin-bottom:4px}
 .contact-grid .val{font-weight:600}
 .contact-grid .hint{font-size:.75em;color:var(--blue);margin-top:8px}
-.qr-box{text-align:center;margin-top:26px}
-.qr-box img{width:190px;height:190px;border-radius:14px;box-shadow:0 8px 24px rgba(15,42,110,.14);cursor:zoom-in;background:#fff;padding:6px}
-.qr-box .qr-tip{margin-top:10px;font-size:.85em;color:var(--muted)}
-.qr-box .qr-tip b{color:var(--blue)}
-.qr-box .qr-zoom{color:#9aa7bd;font-size:.9em}
+#c-wechat-card{padding-top:20px}
+#wechat-qr{width:128px;height:128px;border-radius:12px;background:#fff;padding:5px;box-shadow:0 6px 18px rgba(15,42,110,.16);cursor:zoom-in;margin:8px 0 10px;transition:transform .15s}
+#wechat-qr:hover{transform:scale(1.04)}
+#c-phones .tel-link{display:block;font-weight:600;color:var(--ink);text-decoration:none;padding:3px 0;transition:color .2s}
+#c-phones .tel-link:hover{color:var(--blue)}
+#c-phones .tel-tag{font-size:.78em;color:var(--blue);margin-left:4px}
 #qr-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:400;align-items:center;justify-content:center;cursor:zoom-out}
 #qr-lightbox img{width:min(72vw,420px);height:min(72vw,420px);border-radius:16px;background:#fff;padding:12px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
 .clickable{cursor:pointer;color:inherit;text-decoration:none;display:block;transition:transform .15s,box-shadow .2s}
@@ -253,7 +254,7 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
 </div>
       </div>
     </div>
-    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 15:53（北京时间）</p>
+    <p style="text-align:center;color:#5f7196;font-size:.8em;margin-top:18px">数据更新时间：2026-11-11 16:01（北京时间）</p>
   </div>
 </section>
 
@@ -266,16 +267,17 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       <p>欢迎来电咨询方案设计与工程报价</p>
     </div>
     <div class="contact-grid">
-      <a class="card clickable" id="c-phone-card"><div class="ico">&#128222;</div><div class="label">联系电话</div><div class="val" id="c-phone">1XX-XXXX-XXXX</div><div class="hint">&#128241; 点击拨打</div></a>
-      <div class="card clickable" id="c-wechat-card"><div class="ico">&#128172;</div><div class="label">微信</div><div class="val" id="c-wechat">同手机号</div><div class="hint">&#128203; 点击复制微信号</div></div>
+      <div class="card" id="c-phone-card"><div class="ico">&#128222;</div><div class="label">联系电话</div><div id="c-phones"><div class="val">1XX-XXXX-XXXX</div></div><div class="hint">&#128241; 点击号码直接拨打</div></div>
+      <div class="card" id="c-wechat-card">
+        <div class="label">&#128172; 微信</div>
+        <img id="wechat-qr" src="wechat_qr.png" alt="微信二维码" title="点击放大"/>
+        <div class="val" id="c-wechat">同手机号</div>
+        <div class="hint">&#128241; 长按二维码识别加好友<br/><span id="copy-wx-link" style="color:var(--blue);cursor:pointer">&#128203; 点此复制微信号</span> · <span id="qr-zoom-link" style="color:var(--blue);cursor:pointer">&#128269; 放大</span></div>
+      </div>
       <div class="card"><div class="ico">&#128205;</div><div class="label">公司地址</div><div class="val" id="c-address">湖南省邵阳市（详细地址待补充）</div>
         <div class="map-links"><a id="map-amap" target="_blank" rel="noopener">&#128666; 高德导航</a><a id="map-baidu" target="_blank" rel="noopener">&#128666; 百度导航</a></div>
       </div>
       <div class="card"><div class="ico">&#9200;</div><div class="label">服务时间</div><div class="val" id="c-hours">周一至周六 8:30 - 18:00</div></div>
-    </div>
-    <div class="qr-box">
-      <img id="wechat-qr" src="wechat_qr.png" alt="微信二维码" title="点击放大"/>
-      <div class="qr-tip">&#128241; 微信扫码添加，或<b>长按二维码</b>识别加好友 <span class="qr-zoom">&#128269; 点击可放大</span></div>
     </div>
     <div id="qr-lightbox"><img src="wechat_qr.png" alt="微信二维码（放大）"/></div>
     <div id="copy-toast">&#9989; 微信号已复制，请打开微信搜索添加</div>
@@ -360,13 +362,24 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
       }
       // 联系方式
       if (c.contact) {
-        [['phone','c-phone'],['wechat','c-wechat'],['address','c-address'],['hours','c-hours']]
+        [['wechat','c-wechat'],['address','c-address'],['hours','c-hours']]
           .forEach(function(p){ var el = document.getElementById(p[1]);
             if (c.contact[p[0]]) el.textContent = c.contact[p[0]]; });
-        // 电话卡片：点击拨打
-        if (c.contact.phone) {
-          document.getElementById('c-phone-card').href =
-            'tel:' + String(c.contact.phone).replace(/[^0-9+]/g, '');
+        // 电话卡片：自动解析多个号码，每个做成独立拨号链接（支持"号码（姓名）"格式）
+        var rawPhone = String(c.contact.phone || '');
+        var phoneRe = /(1[3-9]\d{9}|\d{3,4}-\d{7,8})\s*[（(]?([^（）()0-9]{1,6})[）)]?/g;
+        var phones = [], m2;
+        while ((m2 = phoneRe.exec(rawPhone)) !== null) {
+          phones.push({ num: m2[1], tag: (m2[2] || '').trim() });
+        }
+        if (!phones.length && rawPhone) {
+          phones.push({ num: rawPhone.replace(/[^0-9+\-]/g, ''), tag: '' });
+        }
+        if (phones.length) {
+          document.getElementById('c-phones').innerHTML = phones.map(function(p){
+            return '<a class="tel-link" href="tel:' + p.num + '">' + esc(p.num) +
+              (p.tag ? '<span class="tel-tag">（' + esc(p.tag) + '）</span>' : '') + '</a>';
+          }).join('');
         }
         // 地址卡片：地图导航链接
         // 有经纬度 → 直达路线规划/标记点；无 → 按地址关键词搜索
@@ -388,15 +401,19 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
           document.getElementById('map-baidu').href =
             'https://api.map.baidu.com/geocoder?address=' + kw + '&output=html&src=xinghai_web';
         }
-        // 微信二维码：点击放大 / 再点关闭
+        // 微信二维码：点击图片或"放大"→ 弹出灯箱；点击关闭
         var lb = document.getElementById('qr-lightbox');
-        document.getElementById('wechat-qr').addEventListener('click', function(){ lb.style.display = 'flex'; });
+        function openLb(){ lb.style.display = 'flex'; }
+        document.getElementById('wechat-qr').addEventListener('click', openLb);
+        document.getElementById('qr-zoom-link').addEventListener('click', function(e){ e.stopPropagation(); openLb(); });
         lb.addEventListener('click', function(){ lb.style.display = 'none'; });
-        // 微信卡片：点击复制（微信号与电话相同时自动复制号码）
-        var wxCard = document.getElementById('c-wechat-card');
-        wxCard.addEventListener('click', function(){
+        // 微信卡片：点击"复制微信号"复制（微信号与电话相同时自动复制号码）
+        function copyWx(){
           var wx = c.contact.wechat || '';
-          if (!wx || wx === '同手机号') wx = c.contact.phone || wx;
+          if (!wx || wx === '同手机号') {
+            var pm = String(c.contact.phone || '').match(/1[3-9]\d{9}/);
+            wx = pm ? pm[0] : wx;
+          }
           if (!wx) return;
           function ok(){
             var t = document.getElementById('copy-toast');
@@ -410,7 +427,8 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
           } else {
             window.prompt('长按复制微信号：', wx);
           }
-        });
+        }
+        document.getElementById('copy-wx-link').addEventListener('click', function(e){ e.stopPropagation(); copyWx(); });
       }
     }).catch(function(e){ console.warn('content.json 加载失败，使用默认内容', e); });
 })();
