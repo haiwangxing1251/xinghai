@@ -234,9 +234,11 @@ function renderList(schema){
     });
     if (schema.imgUpload){
       var prev = item.img ? '<img class="cert-prev" src="' + esc(item.img) + '?v=' + Date.now() + '"/>' : '';
+      var delBtn = item.img ? '<button type="button" class="btn-danger" style="margin-left:10px;padding:7px 16px;font-size:.82em" onclick="xhDelCertImg(this)">&#10005; 删除图片</button>' : '';
       html += '<label>&#128247; 证书图片（PNG / JPG，1MB 以内；上传后前台直接显示，点图片可放大）</label>' +
         '<div class="cert-up">' + prev +
         '<input type="file" accept="image/png,image/jpeg" onchange="xhUploadCert(this)" style="font-size:.85em"/>' +
+        delBtn +
         '</div>';
     }
     if (schema.imgUploadMulti){
@@ -329,6 +331,15 @@ function xhDelCaseImg(btn){
   var idx = Array.prototype.indexOf.call(box.children, btn.closest(".cimg"));
   CONTENT[key][i].imgs.splice(idx, 1);
   renderCaseImgsBox(item, CONTENT[key][i].imgs);
+}
+// 删除资质图片：清空 img 字段并刷新，前台不再显示该证书图
+function xhDelCertImg(btn){
+  if (!confirm("确定删除这张证书图片？（前台将不再显示，图片文件仍保留在网站上；之后可重新上传）")) return;
+  var item = btn.closest(".item");
+  xhCollectLists();
+  var key = item.dataset.key, i = +item.dataset.i;
+  CONTENT[key][i].img = "";
+  xhRenderAll();
 }
 function xhUploadCaseImgs(btn){
   var token = localStorage.getItem("xh_token");
