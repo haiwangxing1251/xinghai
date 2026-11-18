@@ -79,10 +79,23 @@ def main():
     news = load_json("news.json") or []
     tenders = load_json("tenders.json") or []
 
+    # 站点内容快照（内联进页面，首屏零等待渲染；运行时会再拉 content.json 刷新）
+    content_path = os.path.join(ROOT, "docs", "content.json")
+    inline_json = "{}"
+    if os.path.exists(content_path):
+        try:
+            with open(content_path, encoding="utf-8") as f:
+                content = json.load(f)
+            inline_json = json.dumps(content, ensure_ascii=False, separators=(",", ":"))
+            inline_json = inline_json.replace("</", "<\\/")  # 防止提前闭合 script 标签
+        except (json.JSONDecodeError, OSError) as e:
+            print(f"[site] 内联 content.json 失败: {e}")
+
     html = (html
             .replace("__COMPANY__", COMPANY)
             .replace("__COMPANY_SHORT__", COMPANY_SHORT)
             .replace("__UPDATED__", now)
+            .replace("__INLINE_CONTENT__", inline_json)
             .replace("__NEWS_ITEMS__", render_news_section(news))
             .replace("__TENDER_ITEMS__", render_tender_section(tenders)))
 

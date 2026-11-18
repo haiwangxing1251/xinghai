@@ -300,21 +300,24 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
   </div>
 </footer>
 
+<script>/* 生成时内联的站点数据快照：首屏零等待渲染，随后再拉取 content.json 刷新 */
+window.__XH_CONTENT__ = __INLINE_CONTENT__;</script>
 <script>
 // 点击导航后自动收起移动端菜单
 document.querySelectorAll('.nav-links a').forEach(function(a){
   a.addEventListener('click', function(){ document.getElementById('navLinks').classList.remove('open'); });
 });
 
-// ===== 动态内容渲染（读取 content.json，后台保存后自动生效） =====
+// ===== 动态内容渲染（先用内联快照即时渲染，再拉取 content.json 刷新） =====
 (function(){
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(m){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
 
-  fetch('content.json', {cache:'no-store'})
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(c){
+  var LATEST = null;   // 最新站点数据，供已绑定的事件处理器读取
+
+  function render(c){
       if (!c) return;
+      LATEST = c;
       // 首屏
       if (c.company) {
         if (c.company.name) document.getElementById('hero-name').textContent = c.company.name;
@@ -358,13 +361,16 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
                  '<div class="ico">' + esc(ct.ico || '\u{1F3C6}') + '</div>' +
                  '<div class="cert-name">' + esc(ct.name) + '</div></div>';
         }).join('');
-        document.getElementById('certs-grid').addEventListener('click', function(e){
+        var cgEl = document.getElementById('certs-grid');
+        if (!cgEl.dataset.bound){ cgEl.dataset.bound = '1';
+        cgEl.addEventListener('click', function(e){
           var card = e.target.closest('.cert');
           if (!card || !card.dataset.img) return;
           var lbox = document.getElementById('qr-lightbox');
           lbox.querySelector('img').src = card.dataset.img;
           lbox.style.display = 'flex';
         });
+        }
       }
       // 行业资讯
       if (Array.isArray(c.news)) {
@@ -423,36 +429,46 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
           document.getElementById('map-baidu').href =
             'https://api.map.baidu.com/geocoder?address=' + kw + '&output=html&src=xinghai_web';
         }
-        // 微信二维码：点击图片或"放大"→ 弹出灯箱；点击关闭
+        // 微信二维码：点击图片或"放大"→ 弹出灯箱；点击关闭（只绑定一次，重复渲染不重复绑）
         var lb = document.getElementById('qr-lightbox');
-        function openLb(){ lb.style.display = 'flex'; }
-        document.getElementById('wechat-qr').addEventListener('click', openLb);
-        document.getElementById('qr-zoom-link').addEventListener('click', function(e){ e.stopPropagation(); openLb(); });
-        lb.addEventListener('click', function(){ lb.style.display = 'none'; });
-        // 微信卡片：点击"复制微信号"复制（微信号与电话相同时自动复制号码）
-        function copyWx(){
-          var wx = c.contact.wechat || '';
-          if (!wx || wx === '同手机号') {
-            var pm = String(c.contact.phone || '').match(/1[3-9]\d{9}/);
-            wx = pm ? pm[0] : wx;
-          }
-          if (!wx) return;
-          function ok(){
-            var t = document.getElementById('copy-toast');
-            t.style.display = 'block';
-            clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = 'none'; }, 2600);
-          }
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(wx).then(ok).catch(function(){
-              window.prompt('长按复制微信号：', wx);
-            });
-          } else {
-            window.prompt('长按复制微信号：', wx);
-          }
+        if (!lb.dataset.bound){ lb.dataset.bound = '1';
+          lb.addEventListener('click', function(){ lb.style.display = 'none'; });
+          document.getElementById('wechat-qr').addEventListener('click', function(){ lb.style.display = 'flex'; });
+          document.getElementById('qr-zoom-link').addEventListener('click', function(e){ e.stopPropagation(); lb.style.display = 'flex'; });
         }
-        document.getElementById('copy-wx-link').addEventListener('click', function(e){ e.stopPropagation(); copyWx(); });
+        // 微信卡片：点击"复制微信号"复制（始终读取最新数据 LATEST，避免用旧快照）
+        if (!document.getElementById('copy-wx-link').dataset.bound){
+          document.getElementById('copy-wx-link').dataset.bound = '1';
+          document.getElementById('copy-wx-link').addEventListener('click', function(e){
+            e.stopPropagation();
+            var ct = (LATEST && LATEST.contact) || {};
+            var wx = ct.wechat || '';
+            if (!wx || wx === '同手机号') {
+              var pm = String(ct.phone || '').match(/1[3-9]\d{9}/);
+              wx = pm ? pm[0] : wx;
+            }
+            if (!wx) return;
+            function ok(){
+              var t = document.getElementById('copy-toast');
+              t.style.display = 'block';
+              clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = 'none'; }, 2600);
+            }
+            function fallback(){ window.prompt('长按复制微信号：', wx); }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(wx).then(ok).catch(fallback);
+            } else { fallback(); }
+          });
+        }
       }
-    }).catch(function(e){ console.warn('content.json 加载失败，使用默认内容', e); });
+  }
+
+  // ① 首屏：内联快照立即渲染（跳转、弱网都不再出现空白等待）
+  try { if (window.__XH_CONTENT__) render(window.__XH_CONTENT__); } catch(err){ console.warn(err); }
+  // ② 再拉取最新 content.json 覆盖（后台保存后无需重新生成页面即生效）
+  fetch('content.json', {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(c){ if (c) render(c); })
+    .catch(function(e){ console.warn('content.json 加载失败，使用默认内容', e); });
 })();
 </script>
 </body>
