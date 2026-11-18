@@ -317,7 +317,7 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
         <div class="label">&#128172; 微信</div>
         <img id="wechat-qr" src="wechat_qr.png" alt="微信二维码" title="点击放大"/>
         <div class="val" id="c-wechat">同手机号</div>
-        <div class="hint">&#128241; 长按二维码识别加好友<br/><span id="copy-wx-link" style="color:var(--blue);cursor:pointer">&#128203; 点此复制微信号</span> · <span id="qr-zoom-link" style="color:var(--blue);cursor:pointer">&#128269; 放大</span></div>
+        <div class="hint"><span id="qr-zoom-link" style="color:var(--blue);cursor:pointer">&#128269; 点击二维码可放大</span></div>
       </div>
       <div class="card"><div class="ico">&#128205;</div><div class="label">公司地址</div><div class="val" id="c-address">湖南省邵阳市（详细地址待补充）</div>
         <div class="map-links"><a id="map-amap" target="_blank" rel="noopener">&#128666; 高德导航</a><a id="map-baidu" target="_blank" rel="noopener">&#128666; 百度导航</a></div>
@@ -325,7 +325,6 @@ footer .strong{color:#dfe7f5;font-weight:600;margin-bottom:6px}
       <div class="card"><div class="ico">&#9200;</div><div class="label">服务时间</div><div class="val" id="c-hours">周一至周六 8:30 - 18:00</div></div>
     </div>
     <div id="qr-lightbox"><img src="wechat_qr.png" alt="微信二维码（放大）"/></div>
-    <div id="copy-toast">&#9989; 微信号已复制，请打开微信搜索添加</div>
   </div>
 </section>
 
@@ -483,35 +482,13 @@ document.querySelectorAll('.nav-links a').forEach(function(a){
           document.getElementById('map-baidu').href =
             'https://api.map.baidu.com/geocoder?address=' + kw + '&output=html&src=xinghai_web';
         }
-        // 微信二维码：点击图片或"放大"→ 弹出灯箱；点击关闭（只绑定一次，重复渲染不重复绑）
+        // 微信二维码：点击图片或"放大"文字 → 弹出灯箱；点击关闭（只绑定一次，重复渲染不重复绑）
         var lb = document.getElementById('qr-lightbox');
         if (!lb.dataset.bound){ lb.dataset.bound = '1';
           lb.addEventListener('click', function(){ lb.style.display = 'none'; });
           document.getElementById('wechat-qr').addEventListener('click', function(){ lb.style.display = 'flex'; });
-          document.getElementById('qr-zoom-link').addEventListener('click', function(e){ e.stopPropagation(); lb.style.display = 'flex'; });
-        }
-        // 微信卡片：点击"复制微信号"复制（始终读取最新数据 LATEST，避免用旧快照）
-        if (!document.getElementById('copy-wx-link').dataset.bound){
-          document.getElementById('copy-wx-link').dataset.bound = '1';
-          document.getElementById('copy-wx-link').addEventListener('click', function(e){
-            e.stopPropagation();
-            var ct = (LATEST && LATEST.contact) || {};
-            var wx = ct.wechat || '';
-            if (!wx || wx === '同手机号') {
-              var pm = String(ct.phone || '').match(/1[3-9]\d{9}/);
-              wx = pm ? pm[0] : wx;
-            }
-            if (!wx) return;
-            function ok(){
-              var t = document.getElementById('copy-toast');
-              t.style.display = 'block';
-              clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = 'none'; }, 2600);
-            }
-            function fallback(){ window.prompt('长按复制微信号：', wx); }
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(wx).then(ok).catch(fallback);
-            } else { fallback(); }
-          });
+          var zl = document.getElementById('qr-zoom-link');
+          if (zl) zl.addEventListener('click', function(e){ e.stopPropagation(); lb.style.display = 'flex'; });
         }
       }
   }
